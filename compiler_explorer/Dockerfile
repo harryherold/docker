@@ -42,6 +42,11 @@ ENV PATH /opt/boost-1.74/bin:${PATH}
 ENV LD_LIBRARY_PATH /opt/boost-1.74/lib:${LD_LIBRARY_PATH}
 ENV CPLUS_INCLUDE_PATH /opt/boost-1.74/include/:${CPLUS_INCLUDE_PATH}
 
+RUN cd /opt && \
+    git clone https://github.com/basicpp17/co-cpp19 co-cpp19
+
+ENV CO_CPP19 /opt/co-cpp19/src
+
 RUN useradd -m ceuser && \
     mkdir /opt/compiler-explorer && \
     chown ceuser /opt/compiler-explorer
@@ -52,9 +57,9 @@ RUN git clone https://github.com/compiler-explorer/compiler-explorer . && \
     make prereqs
 
 # Copy the startup script
-# USER root
-# COPY run.sh /
-# RUN chmod +x /run.sh
+USER root
+COPY run.sh /
+RUN chmod o+x /run.sh
 
 # Copy the config files
 USER root
@@ -63,4 +68,5 @@ RUN chown -R ceuser /opt/compiler-explorer/etc/config/
 
 USER ceuser
 EXPOSE 10240
-ENTRYPOINT bash
+WORKDIR /
+ENTRYPOINT /run.sh
